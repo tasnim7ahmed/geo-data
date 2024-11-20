@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CesiumJS Distance Measurement Tool</title>
+    <!-- Include CesiumJS CSS -->
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.91/Build/Cesium/Widgets/widgets.css"
+        rel="stylesheet" />
+
+    <style>
+        /* Ensure the cesiumContainer fills the browser window */
+        html,
+        body,
+        #cesiumContainer {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Style for the measurement button */
+        #measureButton {
+            position: absolute;
+            top: 100px;
+            right: 10px;
+            z-index: 5;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .measurement-active {
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- The container where the Cesium globe will be rendered -->
+    <div id="cesiumContainer"></div>
+
+    <!-- Add a button to activate the measurement tool -->
+    <button id="measureButton">Measure Distance</button>
+
+    <!-- Include CesiumJS JavaScript -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.91/Build/Cesium/Cesium.js"></script>
+
+    <script>
+        console.log(Cesium);
+
+        // Set your Cesium Ion access token
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZTM3MTRlOS0wMzg0LTQ0MDctYmE1NS0wYjgyOTgxNzJlNDgiLCJpZCI6MjU2NTY5LCJpYXQiOjE3MzIwNTI0ODZ9.m_H-gOYRyx_gBCpwEaHG5cdzAK-8551HSS_eo5pu7Yc';
+
+        // Initialize the Cesium Viewer
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: Cesium.createWorldTerrain(),
+            baseLayerPicker: false,
+        });
+        // Enable depth testing against terrain
+        viewer.scene.globe.depthTestAgainstTerrain = true;
+
+        // Function to activate the measurement tool
+        function activateMeasurementTool() {
+            viewer.container.classList.add('measurement-active');
+            let positions = [];
+            const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+            handler.setInputAction(function (click) {
+                viewer.scene.render();
+                console.log('Click position:', click.position);
+                const cartesian = viewer.scene.pickPosition(click.position);
+                console.log('Cartesian position:', cartesian);
+                if (Cesium.defined(cartesian)) {
+                    positions.push(cartesian);
+
+                    // Add a point entity at the clicked position
+                    viewer.entities.add({
+                        position: cartesian,
+                        point: {
+                            pixelSize: 10,
+                            color: Cesium.Color.RED,
+                            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                        },
+                    });
+
+                    if (positions.length >= 2) {
+                        // Calculate distance
+                        const distance = Cesium.Cartesian3.distance(positions[0], positions[1]);
+
+                        // // Display distance
+                        // alert(`Distance: ${(distance / 1000).toFixed(2)} km`);
+
+                        // Draw a line between the two points
+                        viewer.entities.add({
+                            polyline: {
+                                positions: positions,
+                                width: 5,
+                                material: Cesium.Color.YELLOW,
+                                clampToGround: true,
+                            },
+                        });
+
+
+                        // After calculating the distance
+                        // Display distance as a label
+                        viewer.entities.add({
+                            position: positions[1],
+                            label: {
+                                text: `Distance: ${(distance / 1000).toFixed(2)} km`,
+                                font: '16px sans-serif',
+                                fillColor: Cesium.Color.WHITE,
+                                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                                outlineWidth: 2,
+                                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                                pixelOffset: new Cesium.Cartesian2(0, -20),
+                                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                            },
+                        });
+
+
+                        // Clean up
+                        viewer.container.classList.remove('measurement-active');
+                        handler.destroy();
+                    }
+                } else {
+                    console.log('Cartesian is undefined');
+                }
+            }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        }
+
+        document.getElementById('measureButton').addEventListener('click', () => {
+            // Remove previous measurement entities
+            viewer.entities.removeAll();
+            activateMeasurementTool();
+        });
+    </script>
+</body>
+
+</html>

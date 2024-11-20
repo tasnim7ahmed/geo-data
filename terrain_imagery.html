@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CesiumJS Terrain and Imagery Layers</title>
+    <!-- Include CesiumJS CSS -->
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.100/Build/Cesium/Widgets/widgets.css"
+        rel="stylesheet" />
+
+    <style>
+        /* Ensure the cesiumContainer fills the browser window */
+        html,
+        body,
+        #cesiumContainer {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Style for UI buttons */
+        .ui-button {
+            position: absolute;
+            right: 10px;
+            z-index: 5;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        #exaggerateTerrainButton {
+            top: 110px;
+        }
+
+        #changeImageryButton {
+            top: 150px;
+        }
+
+        #addOverlayButton {
+            top: 190px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- The container where the Cesium globe will be rendered -->
+    <div id="cesiumContainer"></div>
+
+    <!-- Add buttons for terrain and imagery layers -->
+    <button id="exaggerateTerrainButton" class="ui-button">Exaggerate Terrain</button>
+    <button id="changeImageryButton" class="ui-button">Change Imagery</button>
+    <button id="addOverlayButton" class="ui-button">Add Overlay</button>
+
+    <!-- Include CesiumJS JavaScript -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.100/Build/Cesium/Cesium.js"></script>
+
+    <script>
+        // Set your Cesium Ion access token
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZTM3MTRlOS0wMzg0LTQ0MDctYmE1NS0wYjgyOTgxNzJlNDgiLCJpZCI6MjU2NTY5LCJpYXQiOjE3MzIwNTI0ODZ9.m_H-gOYRyx_gBCpwEaHG5cdzAK-8551HSS_eo5pu7Yc';
+
+        // Initialize the Cesium Viewer
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: Cesium.createWorldTerrain(),
+            baseLayerPicker: false,
+        });
+
+        // Enable depth testing against terrain
+        viewer.scene.globe.depthTestAgainstTerrain = true;
+
+        // Event listener for Exaggerate Terrain button
+        document.getElementById('exaggerateTerrainButton').addEventListener('click', function () {
+            viewer.scene.terrainExaggeration = 2.0; // Exaggerate terrain by a factor of 2
+        });
+
+        // Event listener for Change Imagery button
+        document.getElementById('changeImageryButton').addEventListener('click', function () {
+            // Remove existing imagery layers
+            viewer.imageryLayers.removeAll();
+
+            // Add OpenStreetMap imagery
+            const osmImagery = new Cesium.OpenStreetMapImageryProvider({
+                url: 'https://a.tile.openstreetmap.org/',
+            });
+
+            viewer.imageryLayers.addImageryProvider(osmImagery);
+        });
+
+        // Event listener for Add Overlay button
+        document.getElementById('addOverlayButton').addEventListener('click', function () {
+            // Add an overlay imagery layer (e.g., a WMS service)
+            const overlayImagery = new Cesium.WebMapServiceImageryProvider({
+                url: 'https://ahocevar.com/geoserver/wms',
+                layers: 'topp:states',
+                parameters: {
+                    transparent: true,
+                    format: 'image/png',
+                },
+            });
+
+            const overlayLayer = viewer.imageryLayers.addImageryProvider(overlayImagery);
+
+            // Set properties of the overlay layer
+            overlayLayer.alpha = 0.5; // Set transparency
+        });
+    </script>
+</body>
+
+</html>

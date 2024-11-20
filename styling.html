@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CesiumJS - Styling Entities</title>
+    <!-- Include CesiumJS CSS -->
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.100/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        html,
+        body,
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .ui-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 5;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cesium Container -->
+    <div id="cesiumContainer"></div>
+    <!-- UI Button -->
+    <button id="loadStyledGeoJsonButton" class="ui-button">Load Styled GeoJSON</button>
+    <!-- Include CesiumJS JavaScript -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.100/Build/Cesium/Cesium.js"></script>
+    <script>
+        // Set Cesium Ion access token
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZTM3MTRlOS0wMzg0LTQ0MDctYmE1NS0wYjgyOTgxNzJlNDgiLCJpZCI6MjU2NTY5LCJpYXQiOjE3MzIwNTI0ODZ9.m_H-gOYRyx_gBCpwEaHG5cdzAK-8551HSS_eo5pu7Yc';
+
+        // Initialize the Cesium Viewer
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: Cesium.createWorldTerrain(),
+            baseLayerPicker: false,
+        });
+
+        // Event listener for Load Styled GeoJSON button
+        document.getElementById('loadStyledGeoJsonButton').addEventListener('click', function () {
+            // Load and style GeoJSON data
+            Cesium.GeoJsonDataSource.load('./data/BGD.geo.json').then(function (dataSource) {
+                viewer.dataSources.add(dataSource);
+                viewer.zoomTo(dataSource);
+
+                const entities = dataSource.entities.values;
+
+                for (let i = 0; i < entities.length; i++) {
+                    const entity = entities[i];
+                    const magnitude = entity.properties.magnitude || 1; // Assuming 'magnitude' is a property
+
+                    // Style point entities
+                    entity.point = new Cesium.PointGraphics({
+                        pixelSize: magnitude * 2,
+                        color: Cesium.Color.RED.withAlpha(0.5),
+                        outlineColor: Cesium.Color.WHITE,
+                        outlineWidth: 1
+                    });
+                }
+            }).otherwise(function (error) {
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+
+</html>
