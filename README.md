@@ -91,3 +91,64 @@ Follow these instructions to set up and run the examples on your local machine.
    ```bash
    git clone https://github.com/your-username/cesiumjs-web-apps.git
    cd cesiumjs-web-apps
+   ```
+
+2. **Install a Local Web Server (if needed):**
+
+   You can use [http-server](https://www.npmjs.com/package/http-server) or any other web server.
+
+   ```bash
+   npm install -g http-server
+   ```
+
+### Running the Examples
+
+1. **Start the Web Server:**
+
+   ```bash
+   http-server
+   ```
+
+   By default, it serves at `http://localhost:8080`.
+
+2. **Open the Desired Example:**
+
+   - **Distance Measurement Tool:** [http://localhost:8080/distance-measurement.html](http://localhost:8080/distance-measurement.html)
+   - **Terrain and Imagery Layers:** [http://localhost:8080/terrain-imagery-layers.html](http://localhost:8080/terrain-imagery-layers.html)
+   - **Camera Control:** [http://localhost:8080/camera-control.html](http://localhost:8080/camera-control.html)
+   - **Styling Entities with GeoJSON:** [http://localhost:8080/styling-entities.html](http://localhost:8080/styling-entities.html)
+   - **Load GeoJSON Data:** [http://localhost:8080/load-geojson.html](http://localhost:8080/load-geojson.html)
+
+   > **Note:** Ensure that the `data` folder containing `BGD.geo.json` is correctly placed relative to the HTML files for GeoJSON examples to work.
+
+## Customization
+
+Each example includes comments and code that can be modified to suit your needs. Feel free to explore and enhance the functionalities:
+
+- **Cesium Ion Access Token:**
+
+  Replace the default access token with your own Cesium Ion token for better quota and access to private assets.
+
+  ```javascript
+  Cesium.Ion.defaultAccessToken = 'YOUR_CESIUM_ION_ACCESS_TOKEN';
+  ```
+
+- **GeoJSON Data:**
+
+  Update the GeoJSON file paths or use your own datasets.
+
+- **Styling and UI:**
+
+  Modify CSS styles or add new UI elements to improve the user experience.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Contact
+
+For questions, suggestions, or contributions, please open an issue or contact [tasnimahmed@iut-dhaka.edu](mailto:tasnimahmed@iut-dhaka.edu).
+
+---
+
+Happy Mapping! 🚀
